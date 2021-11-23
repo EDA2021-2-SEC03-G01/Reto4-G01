@@ -25,12 +25,17 @@
  """
 
 
-import config as cf
-from DISClib.ADT import list as lt
+import config
+from DISClib.ADT.graph import gr
 from DISClib.ADT import map as mp
+from DISClib.ADT import list as lt
+from DISClib.Algorithms.Graphs import scc
+from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.Utils import error as error
+assert config
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
-assert cf
+
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -38,9 +43,93 @@ los mismos.
 """
 
 # Construccion de modelos
+def NewAnalyzer():
+    analyzer = {"ciudades":None,
+                "aeropuertos":None,
+                "rutas_dobles":None,
+                "rutas_unicas":None
+                }
+    analyzer["ciudades"] = mp.newMap(numelements=41001,
+                                    maptype='PROBING',
+                                    comparefunction=None)
+    analyzer["aeropuertos"] = mp.newMap(numelements=9100,
+                                        maptype="PROBING",
+                                        comparefunction=None)
+    analyzer["rutas_dobles"] = gr.newGraph(datastructure="ADJ_LIST",
+                                            directed=False,
+                                            size=9100,
+                                            comparefunction=None)
+    analyzer["rutas_unicas"] = gr.newGraph(datastructure="ADJ_LIST",
+                                            directed=True,
+                                            size=9100,
+                                            comparefunction=None)
+    
+
+
+
 
 # Funciones para agregar informacion al catalogo
+def addAirport (analyzer, airport):
+    cod_aeropuerto = airport["IATA"]
+    entry = mp.get(analyzer["aeropuertos"], cod_aeropuerto )
+    if entry is None:
+        datentry = newDataEntry(airport)
+        mp.put(analyzer["aeropuertos"], cod_aeropuerto, datentry)
+    else:
+        datentry = me.getValue(entry)
+    airport["num_routes"] = 0
+    add(datentry, airport)
+    return analyzer
 
+def addCiudad(analyzer, city):
+    ciudad = city["city"]
+    entry = mp.get(analyzer["ciudades"], ciudad)
+    if entry is None:
+        datentry = newDataEntry(city)
+        mp.put(analyzer["ciudades"], ciudad, datentry)
+    else:
+        datentry = me.getValue(entry)
+    add(datentry, ciudad)
+    return analyzer
+
+
+def AddConnections (analyzer, route):
+    origen = route["Departure"]
+    destino = route["Destination"]
+    distancia = route["distance_km"]
+    addVertex(analyzer, origen)
+    addVertex(analyzer, destino)
+    addConnection(analyzer, origen, destino, distancia)
+    addRoute(analyzer, origen, destino)
+
+
+def addVertex(analyzer, aeropuerto):
+    if not gr.containsVertex(analyzer['rutas_unicas'], aeropuerto):
+            gr.insertVertex(analyzer['rutas_unicas'], aeropuerto)
+    return analyzer
+
+def addConnection(analyzer, origin, destination, distance):
+    edge = gr.getEdge(analyzer['rutas_unicas'], origin, destination)
+    if edge is None:
+        gr.addEdge(analyzer['rutas_unicas'], origin, destination, distance)
+    return analyzer
+
+def addRoute(analyzer, origen, destino):
+    analyzer["aeropuertos"][origen][0]["num_routes"] += 1
+    analyzer["aeropuertos"][destino][0]["num_routes"] += 1
+    return analyzer
+
+def add(datentry, entry):
+    lt.addLast(datentry, entry)
+    return datentry
+
+def newDataEntry(entry):
+    """
+    Crea una entrada en el indice por fechas, es decir en el arbol
+    binario.
+    """
+    entry=lt.newList(datastructure="ARRAY_LIST")
+    return entry
 # Funciones para creacion de datos
 
 # Funciones de consulta
