@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.DataStructures.chaininghashtable import keySet
 import config
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as mp
@@ -43,7 +44,7 @@ los mismos.
 """
 
 # Construccion de modelos
-def NewAnalyzer():
+def newAnalyzer():
     analyzer = {"ciudades":None,
                 "aeropuertos":None,
                 "rutas_dobles":None,
@@ -55,18 +56,11 @@ def NewAnalyzer():
     analyzer["aeropuertos"] = mp.newMap(numelements=9100,
                                         maptype="PROBING",
                                         comparefunction=None)
-    analyzer["rutas_dobles"] = gr.newGraph(datastructure="ADJ_LIST",
-                                            directed=False,
-                                            size=9100,
-                                            comparefunction=None)
     analyzer["rutas_unicas"] = gr.newGraph(datastructure="ADJ_LIST",
                                             directed=True,
                                             size=9100,
                                             comparefunction=None)
-    
-
-
-
+    return analyzer
 
 # Funciones para agregar informacion al catalogo
 def addAirport (analyzer, airport):
@@ -89,11 +83,11 @@ def addCiudad(analyzer, city):
         mp.put(analyzer["ciudades"], ciudad, datentry)
     else:
         datentry = me.getValue(entry)
-    add(datentry, ciudad)
+    add(datentry, city)
     return analyzer
 
 
-def AddConnections (analyzer, route):
+def addConnections (analyzer, route):
     origen = route["Departure"]
     destino = route["Destination"]
     distancia = route["distance_km"]
@@ -115,8 +109,8 @@ def addConnection(analyzer, origin, destination, distance):
     return analyzer
 
 def addRoute(analyzer, origen, destino):
-    analyzer["aeropuertos"][origen][0]["num_routes"] += 1
-    analyzer["aeropuertos"][destino][0]["num_routes"] += 1
+    mp.get(analyzer["aeropuertos"], origen)["value"]["elements"][0]["num_routes"] += 1
+    mp.get(analyzer["aeropuertos"], destino)["value"]["elements"][0]["num_routes"] += 1
     return analyzer
 
 def add(datentry, entry):
@@ -130,9 +124,36 @@ def newDataEntry(entry):
     """
     entry=lt.newList(datastructure="ARRAY_LIST")
     return entry
+
 # Funciones para creacion de datos
 
 # Funciones de consulta
+
+def totalAirports(analyzer):
+    """
+    Retorna el total de estaciones (vertices) del grafo
+    """
+    return gr.numVertices(analyzer['rutas_unicas'])
+
+def totalRoutes(analyzer):
+    """
+    Retorna el total arcos del grafo
+    """
+    return gr.numEdges(analyzer['rutas_unicas'])
+
+def totalCities(analyzer):
+    """
+    Retorna el total de ciudades
+    """
+    return lt.size(mp.keySet(analyzer["ciudades"]))
+
+def infoPrimerAeropuerto(analyzer):
+    aeropuerto = lt.getElement(mp.keySet(analyzer["aeropuertos"]), 1)
+    return mp.get(analyzer["aeropuertos"], aeropuerto)["value"]["elements"][0]
+
+def infoUltimaCiudad(analyzer):
+    ciudad = lt.getElement(mp.keySet(analyzer["ciudades"]), lt.size(mp.keySet(analyzer["ciudades"])))
+    return mp.get(analyzer["ciudades"], ciudad)["value"]["elements"][0]
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

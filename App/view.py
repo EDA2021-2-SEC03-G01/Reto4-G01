@@ -34,6 +34,10 @@ se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
 
+airportsfile = 'Skylines/airports_full.csv'
+routesfile = 'Skylines/routes_full.csv'
+citiesfile = 'Skylines/worldcities.csv'
+
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
@@ -54,6 +58,15 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
+        cont = controller.init()
+        #cargar datos
+        print("\nCargando información ....\n")
+        controller.loadServices(cont, airportsfile, routesfile, citiesfile)
+        print("El número total de aeropuertos es: " + str(controller.totalAirports(cont)))
+        print("El número total de rutas es: " + str(controller.totalRoutes(cont)))
+        print("El número total de ciudades es: " + str(controller.totalCities(cont)))
+        print("La información del primer aeropuerto cargado es: " + str(controller.infoPrimerAeropuerto(cont)))
+        print("La información de la última ciudad cargada es: " + str(controller.infoUltimaCiudad(cont))+"\n")
 
     elif int(inputs[0]) == 2:
         pass
