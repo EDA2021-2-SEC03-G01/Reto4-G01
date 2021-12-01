@@ -84,6 +84,12 @@ def infoPrimerAeropuerto(analyzer):
 def infoUltimaCiudad(analyzer):
     return model.infoUltimaCiudad(analyzer)
 
+#Requerimientos
+
 def req_1(analyzer):
-    (lista_mayores, mayor) = model.req_1(analyzer)
-    return (lista_mayores, mayor)
+    num, lista = model.req_1(analyzer)
+    return num, lista
+
+def req_2(analyzer, a1, a2):
+    num, mismo = model.req_2(analyzer, a1, a2)
+    return num, mismo

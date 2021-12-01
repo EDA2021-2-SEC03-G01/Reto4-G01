@@ -23,6 +23,8 @@
 import config as cf
 import sys
 import controller
+import threading
+from DISClib.ADT import stack
 from DISClib.ADT import list as lt
 assert cf
 
@@ -53,28 +55,49 @@ catalog = None
 """
 Menu principal
 """
-while True:
-    printMenu()
-    inputs = input('Seleccione una opción para continuar\n')
-    if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
-        cont = controller.init()
-        #cargar datos
-        print("\nCargando información ....\n")
-        controller.loadServices(cont, airportsfile, routesfile, citiesfile)
-        print("El número total de aeropuertos es: " + str(controller.totalAirports(cont)))
-        print("El número total de rutas es: " + str(controller.totalRoutes(cont)))
-        print("El número total de ciudades es: " + str(controller.totalCities(cont)))
-        print("La información del primer aeropuerto cargado es: " + str(controller.infoPrimerAeropuerto(cont)))
-        print("La información de la última ciudad cargada es: " + str(controller.infoUltimaCiudad(cont))+"\n")
+def thread_cycle():
+    while True:
+        printMenu()
+        inputs = input('Seleccione una opción para continuar\n')
+        if int(inputs[0]) == 1:
+            print("Cargando información de los archivos ....")
+            cont = controller.init()
+            #cargar datos
+            print("\nCargando información ....\n")
+            controller.loadServices(cont, airportsfile, routesfile, citiesfile)
+            print("El número total de aeropuertos es: " + str(controller.totalAirports(cont)))
+            print("El número total de rutas es: " + str(controller.totalRoutes(cont)))
+            print("El número total de ciudades es: " + str(controller.totalCities(cont)))
+            print("La información del primer aeropuerto cargado es: " + str(controller.infoPrimerAeropuerto(cont)))
+            print("La información de la última ciudad cargada es: " + str(controller.infoUltimaCiudad(cont))+"\n")
 
-    elif int(inputs[0]) == 2:
-        print("\nCargando aeropuertos más conectados...\n")
-        print("Los aeropuertos más conectados son: \n")
-        (lista_mayores, mayor) = controller.req_1(cont)
-        for aer in lt.iterator(lista_mayores):
-            print("IATA : " + str(aer["IATA"]) + " - Nombre : " + str(aer["Name"]) + " - Ciudad : " + str(aer["City"]) + " - Pais : "+ str(aer["Country"]) + " - Numero Rutas : " + str(aer["num_routes"]))
-        print("Cada uno con " + str(mayor) + " rutas")
-    else:
-        sys.exit(0)
+        elif int(inputs[0]) == 2:
+            print("\nCargando aeropuertos más conectados...\n")
+            num, lista = controller.req_1(cont)
+            for a in lt.iterator(lista):
+                print("IATA : " + a["IATA"] + " - Nombre : " + a["Name"] + " - Ciudad : " + a["City"] +
+                    " - Pais : "+ a["Country"] + " - Numero Rutas : " + str(a["num_routes"]))
+            print("Estos son los eropuertos interconectados. En total son " + str(num) +"\n")
+
+        elif int(inputs[0]) == 3:
+            print("\nCargando aeropuertos más conectados...\n")
+            a1 = input("Ingrese el primer aeropuerto de interés:")
+            a2 = input("Ingrese el segundo aeropuerto de interés:")
+            num, mismo = controller.req_2(cont, a1, a2)
+            print("\nEn total hay " + str(num) + "clústeres.")
+            if mismo == True:
+                print(a1 + " y " + a2 + " sí están en el mismo clúster")
+            else:
+                print(a1 + " y " + a2 + " no están en el mismo clúster")
+
+        else:
+            sys.exit(0)
+
+
+if __name__ == "__main__":
+    threading.stack_size(67108864)  # 64MB stack
+    sys.setrecursionlimit(2 ** 20)
+    thread = threading.Thread(target=thread_cycle)
+    thread.start()
+        
 sys.exit(0)

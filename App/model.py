@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.ADT.queue import size
 from DISClib.DataStructures.chaininghashtable import keySet
 import config
 from DISClib.ADT.graph import gr
@@ -162,16 +163,19 @@ def infoUltimaCiudad(analyzer):
 #Requerimientos
 
 def req_1(analyzer):
+    rutas = analyzer["rutas_unicas"]
     aeropuertos = analyzer["aeropuertos"]
-    lista_aeropuertos = mp.keySet(aeropuertos)
-    mayor=0
-    for aer in lt.iterator(lista_aeropuertos):
-        num_rutas = mp.get(aeropuertos, aer)["value"]["elements"][0]["num_routes"]
-        if int(num_rutas) > mayor:
-            lista_mayores = lt.newList(datastructure="ARRAY_LIST")
-            lt.addLast(lista_mayores,  mp.get(aeropuertos, aer)["value"]["elements"][0])
-            mayor = int(num_rutas)
-        elif int(num_rutas) == mayor:
-            lt.addLast(lista_mayores,  mp.get(aeropuertos, aer)["value"]["elements"][0])
-    return (lista_mayores, mayor)
+    lista = lt.newList(datastructure="ARRAY_LIST")
+    num = 0
+    for a in lt.iterator(gr.vertices(rutas)):
+        if gr.degree(rutas, a) > 1:
+            num += 1
+            lt.addLast(lista, mp.get(aeropuertos, a)["value"]["elements"][0])
+    return num, lista
 
+def req_2(analyzer, a1, a2):
+    rutas = analyzer["rutas_unicas"]
+    clusters = scc.KosarajuSCC(rutas)
+    num = scc.connectedComponents(clusters)
+    mismo = scc.stronglyConnected(clusters, a1, a2)
+    return num, mismo
