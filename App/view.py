@@ -69,8 +69,12 @@ while True:
         print("La información de la última ciudad cargada es: " + str(controller.infoUltimaCiudad(cont))+"\n")
 
     elif int(inputs[0]) == 2:
-        pass
-
+        print("\nCargando aeropuertos más conectados...\n")
+        print("Los aeropuertos más conectados son: \n")
+        (lista_mayores, mayor) = controller.req_1(cont)
+        for aer in lt.iterator(lista_mayores):
+            print("IATA : " + str(aer["IATA"]) + " - Nombre : " + str(aer["Name"]) + " - Ciudad : " + str(aer["City"]) + " - Pais : "+ str(aer["Country"]) + " - Numero Rutas : " + str(aer["num_routes"]))
+        print("Cada uno con " + str(mayor) + " rutas")
     else:
         sys.exit(0)
 sys.exit(0)

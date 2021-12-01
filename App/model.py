@@ -158,3 +158,20 @@ def infoUltimaCiudad(analyzer):
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
+
+#Requerimientos
+
+def req_1(analyzer):
+    aeropuertos = analyzer["aeropuertos"]
+    lista_aeropuertos = mp.keySet(aeropuertos)
+    mayor=0
+    for aer in lt.iterator(lista_aeropuertos):
+        num_rutas = mp.get(aeropuertos, aer)["value"]["elements"][0]["num_routes"]
+        if int(num_rutas) > mayor:
+            lista_mayores = lt.newList(datastructure="ARRAY_LIST")
+            lt.addLast(lista_mayores,  mp.get(aeropuertos, aer)["value"]["elements"][0])
+            mayor = int(num_rutas)
+        elif int(num_rutas) == mayor:
+            lt.addLast(lista_mayores,  mp.get(aeropuertos, aer)["value"]["elements"][0])
+    return (lista_mayores, mayor)
+
