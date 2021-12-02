@@ -217,13 +217,17 @@ def req_2(analyzer, a1, a2):
     mismo = scc.stronglyConnected(clusters, a1, a2)
     return num, mismo
 
-def req_3(analyzer, ciudad_or, ciudad_des):
+def ciudades_homonimas(analyzer, ciudad):
+    lista_ciudades = mp.get(analyzer["ciudades"], ciudad)["value"]
+    return lista_ciudades
+
+def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     centinela=True
     centinela1=True
-    lat_ciu_or = mp.get(analyzer["ciudades"], ciudad_or)["value"]["elements"][0]["lat"]
-    lng_ciu_or = mp.get(analyzer["ciudades"], ciudad_or)["value"]["elements"][0]["lng"]
-    lat_ciu_des = mp.get(analyzer["ciudades"], ciudad_des)["value"]["elements"][0]["lat"]
-    lng_ciu_des = mp.get(analyzer["ciudades"], ciudad_des)["value"]["elements"][0]["lng"]
+    lat_ciu_or = mp.get(analyzer["ciudades"], ciudad_or)["value"]["elements"][int(a)-1]["lat"]
+    lat_ciu_des = mp.get(analyzer["ciudades"], ciudad_des)["value"]["elements"][int(b)-1]["lat"]
+    lng_ciu_or = mp.get(analyzer["ciudades"], ciudad_or)["value"]["elements"][int(a)-1]["lng"]
+    lng_ciu_des = mp.get(analyzer["ciudades"], ciudad_des)["value"]["elements"][int(b)-1]["lng"]
     i=1
     lista_aeropuertos_or = lt.newList(datastructure="ARRAY_LIST")
     lista_aeropuertos_des = lt.newList(datastructure="ARRAY_LIST")

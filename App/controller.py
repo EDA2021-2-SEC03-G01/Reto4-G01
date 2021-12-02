@@ -94,6 +94,11 @@ def req_1(analyzer):
 def req_2(analyzer, a1, a2):
     num, mismo = model.req_2(analyzer, a1, a2)
     return num, mismo
-def req_3(analyzer, ciudad_or, ciudad_des):
-    (origen, destino, camino_minimo) = model.req_3(analyzer, ciudad_or, ciudad_des)
+
+def ciudades_homonimas(analyzer, ciudad):
+    lista_ciudades = model.ciudades_homonimas(analyzer, ciudad)
+    return lista_ciudades
+
+def req_3(analyzer, ciudad_or, ciudad_des, a, b):
+    (origen, destino, camino_minimo) = model.req_3(analyzer, ciudad_or, ciudad_des, a, b)
     return (origen, destino, camino_minimo)
