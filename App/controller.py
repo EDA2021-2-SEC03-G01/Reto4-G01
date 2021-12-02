@@ -43,6 +43,7 @@ def loadServices(analyzer, airportsfile, routesfile, citiesfile):
                                 delimiter=",")
     for airport in input_airportsfile:
         model.addAirport(analyzer, airport)
+        model.addLatitud(analyzer, airport)
 
     routesfile = cf.data_dir + routesfile
     input_routesfile = csv.DictReader(open(routesfile, encoding="utf-8"),
@@ -93,3 +94,6 @@ def req_1(analyzer):
 def req_2(analyzer, a1, a2):
     num, mismo = model.req_2(analyzer, a1, a2)
     return num, mismo
+def req_3(analyzer, ciudad_or, ciudad_des):
+    (origen, destino, camino_minimo) = model.req_3(analyzer, ciudad_or, ciudad_des)
+    return (origen, destino, camino_minimo)

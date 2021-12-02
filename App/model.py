@@ -28,7 +28,7 @@
 from DISClib.ADT.queue import size
 from DISClib.DataStructures.chaininghashtable import keySet
 import config
-from DISClib.ADT.graph import gr
+from DISClib.ADT.graph import getEdge, gr
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 from DISClib.Algorithms.Graphs import scc
@@ -37,6 +37,7 @@ from DISClib.Utils import error as error
 assert config
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from math import sin, cos, acos, radians
 
 
 """
@@ -57,6 +58,9 @@ def newAnalyzer():
     analyzer["aeropuertos"] = mp.newMap(numelements=9100,
                                         maptype="PROBING",
                                         comparefunction=None)
+    analyzer["latitudes"] = mp.newMap(numelements=9100,
+                                        maptype="PROBING",
+                                        comparefunction=None)
     analyzer["rutas_unicas"] = gr.newGraph(datastructure="ADJ_LIST",
                                             directed=True,
                                             size=9100,
@@ -73,6 +77,17 @@ def addAirport (analyzer, airport):
     else:
         datentry = me.getValue(entry)
     airport["num_routes"] = 0
+    add(datentry, airport)
+    return analyzer
+
+def addLatitud (analyzer, airport):
+    latitud = airport["Latitude"]
+    entry = mp.get(analyzer["latitudes"], latitud )
+    if entry is None:
+        datentry = newDataEntry(airport)
+        mp.put(analyzer["latitudes"], latitud, datentry)
+    else:
+        datentry = me.getValue(entry)
     add(datentry, airport)
     return analyzer
 
@@ -156,6 +171,28 @@ def infoUltimaCiudad(analyzer):
     ciudad = lt.getElement(mp.keySet(analyzer["ciudades"]), lt.size(mp.keySet(analyzer["ciudades"])))
     return mp.get(analyzer["ciudades"], ciudad)["value"]["elements"][0]
 
+def semiverseno(lat1, lat2, lng1, lng2):
+    punto_1 = (radians(float(lat1)), radians(float(lng1)))
+    punto_2 = (radians(float(lat2)), radians(float(lng2)))
+    distancia = acos(sin(punto_1[0])*sin(punto_2[0]) + cos(punto_1[0])*cos(punto_2[0])*cos(punto_1[1]-punto_2[1]))
+    return distancia * 6371.01
+
+def minimumCostPaths(analyzer, initialStation):
+    """
+    Calcula los caminos de costo mínimo desde la estacion initialStation
+    a todos los demas vertices del grafo
+    """
+    analyzer['paths'] = djk.Dijkstra(analyzer['rutas_unicas'], initialStation)
+    return analyzer
+
+def minimumCostPath(analyzer, destStation):
+    """
+    Retorna el camino de costo minimo entre la estacion de inicio
+    y la estacion destino
+    Se debe ejecutar primero la funcion minimumCostPaths
+    """
+    path = djk.pathTo(analyzer['paths'], destStation)
+    return path
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
@@ -179,3 +216,54 @@ def req_2(analyzer, a1, a2):
     num = scc.connectedComponents(clusters)
     mismo = scc.stronglyConnected(clusters, a1, a2)
     return num, mismo
+
+def req_3(analyzer, ciudad_or, ciudad_des):
+    centinela=True
+    centinela1=True
+    lat_ciu_or = mp.get(analyzer["ciudades"], ciudad_or)["value"]["elements"][0]["lat"]
+    lng_ciu_or = mp.get(analyzer["ciudades"], ciudad_or)["value"]["elements"][0]["lng"]
+    lat_ciu_des = mp.get(analyzer["ciudades"], ciudad_des)["value"]["elements"][0]["lat"]
+    lng_ciu_des = mp.get(analyzer["ciudades"], ciudad_des)["value"]["elements"][0]["lng"]
+    i=1
+    lista_aeropuertos_or = lt.newList(datastructure="ARRAY_LIST")
+    lista_aeropuertos_des = lt.newList(datastructure="ARRAY_LIST")
+    latitudes = mp.keySet(analyzer["latitudes"])
+    while centinela or centinela1:
+        for lat in lt.iterator(latitudes):
+            aer_lat = mp.get(analyzer["latitudes"], lat)["value"]
+            for aer in lt.iterator(aer_lat):
+                if (float(lat_ciu_or)-(0.1*i)) <= float(lat) <= (float(lat_ciu_or)+(0.1*i)) and (float(lng_ciu_or)-(0.1*i)) <= float(aer["Longitude"]) <= (float(lng_ciu_or)+(0.1*i)):
+                    lt.addLast(lista_aeropuertos_or, aer)
+                    centinela = False
+                if (float(lat_ciu_des)-(0.1*i)) <= float(lat) <= (float(lat_ciu_des)+(0.1*i)) and (float(lng_ciu_des)-(0.1*i)) <= float(aer["Longitude"]) <= (float(lng_ciu_des)+(0.1*i)):
+                    lt.addLast(lista_aeropuertos_des, aer) 
+                    centinela1 = False
+        i += 1
+    menor=9999999
+    for aer in lt.iterator(lista_aeropuertos_or):
+        print(aer)
+        lat = aer["Latitude"]
+        lng = aer["Longitude"]
+        distancia = semiverseno(lat_ciu_or, lat, lng_ciu_or, lng)
+        if distancia <= menor:
+            distancia = menor
+            origen = aer
+    dist_origen = menor
+    print(origen)
+    menor = 999999
+    for aer in lt.iterator(lista_aeropuertos_des):
+        print(aer)
+        lat = aer["Latitude"]
+        lng = aer["Longitude"]
+        distancia = semiverseno(lat_ciu_or, lat, lng_ciu_or, lng)
+        if distancia <= menor:
+            distancia = menor
+            destino = aer
+    print(destino)
+    dist_destino = menor
+    caminos_minimos = minimumCostPaths(analyzer, origen)
+    camino_minimo = minimumCostPath(analyzer, destino)
+    return (origen, destino, camino_minimo)
+
+
+

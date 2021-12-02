@@ -90,6 +90,13 @@ def thread_cycle():
             else:
                 print(a1 + " y " + a2 + " no están en el mismo clúster")
 
+        elif int(inputs[0]) == 4:
+            ciudad_or = input("Introduzca la ciudad de origen: ")
+            ciudad_des = input("Introduzca la ciudad de destino: ")
+            (origen, destino, camino_minimo) = controller.req_3(cont, ciudad_or, ciudad_des)
+            print("El aeropuerto de origen es: " + origen["Name"])
+            print("El aeropuerto de destino es: " + destino["Name"])
+            print("El recorrido que se hace es: " + str(camino_minimo))
         else:
             sys.exit(0)
 
