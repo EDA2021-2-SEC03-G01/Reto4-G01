@@ -38,6 +38,7 @@ def init():
 # Funciones para la carga de datos
 
 def loadServices(analyzer, airportsfile, routesfile, citiesfile):
+    c = 0
     airportsfile = cf.data_dir + airportsfile
     input_airportsfile = csv.DictReader(open(airportsfile, encoding="utf-8"),
                                 delimiter=",")
@@ -49,6 +50,7 @@ def loadServices(analyzer, airportsfile, routesfile, citiesfile):
     input_routesfile = csv.DictReader(open(routesfile, encoding="utf-8"),
                                 delimiter=",")
     for route in input_routesfile:
+        c += 1
         model.addConnections(analyzer, route)
 
     citiesfile = cf.data_dir + citiesfile
@@ -56,7 +58,8 @@ def loadServices(analyzer, airportsfile, routesfile, citiesfile):
                                 delimiter=",")
     for city in input_citiesfile:
         model.addCiudad(analyzer, city)
-    return analyzer
+        model.addidCiudad(analyzer, city)
+    return analyzer,c
 
 # Funciones de ordenamiento
 

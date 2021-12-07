@@ -55,6 +55,9 @@ def newAnalyzer():
     analyzer["ciudades"] = mp.newMap(numelements=41001,
                                     maptype='PROBING',
                                     comparefunction=None)
+    analyzer["id_ciudades"] = mp.newMap(numelements=41001,
+                                        maptype='PROBING',
+                                        comparefunction=None)
     analyzer["aeropuertos"] = mp.newMap(numelements=9100,
                                         maptype="PROBING",
                                         comparefunction=None)
@@ -102,6 +105,17 @@ def addCiudad(analyzer, city):
     add(datentry, city)
     return analyzer
 
+def addidCiudad(analyzer, city):
+    ciudad = city["id"]
+    entry = mp.get(analyzer["id_ciudades"], ciudad)
+    if entry is None:
+        datentry = newDataEntry(city)
+        mp.put(analyzer["id_ciudades"], ciudad, datentry)
+    else:
+        datentry = me.getValue(entry)
+    add(datentry, city)
+    return analyzer
+
 
 def addConnections (analyzer, route):
     origen = route["Departure"]
@@ -119,12 +133,13 @@ def addVertex(analyzer, aeropuerto):
     return analyzer
 
 def addConnection(analyzer, origin, destination, distance):
-    edge = gr.getEdge(analyzer['rutas_unicas'], origin, destination)
-    if edge is None:
-        gr.addEdge(analyzer['rutas_unicas'], origin, destination, distance)
+    #edge = gr.getEdge(analyzer['rutas_unicas'], origin, destination)
+    #if edge is None:
+    gr.addEdge(analyzer['rutas_unicas'], origin, destination, distance)
     return analyzer
 
 def addRoute(analyzer, origen, destino):
+
     mp.get(analyzer["aeropuertos"], origen)["value"]["elements"][0]["num_routes"] += 1
     mp.get(analyzer["aeropuertos"], destino)["value"]["elements"][0]["num_routes"] += 1
     return analyzer
@@ -147,9 +162,9 @@ def newDataEntry(entry):
 
 def totalAirports(analyzer):
     """
-    Retorna el total de estaciones (vertices) del grafo
+    Retorna el total de aeropuertos
     """
-    return gr.numVertices(analyzer['rutas_unicas'])
+    return mp.size(analyzer["aeropuertos"])
 
 def totalRoutes(analyzer):
     """
@@ -161,7 +176,7 @@ def totalCities(analyzer):
     """
     Retorna el total de ciudades
     """
-    return lt.size(mp.keySet(analyzer["ciudades"]))
+    return mp.size(analyzer["id_ciudades"])
 
 def infoPrimerAeropuerto(analyzer):
     aeropuerto = lt.getElement(mp.keySet(analyzer["aeropuertos"]), 1)
@@ -193,10 +208,31 @@ def minimumCostPath(analyzer, destStation):
     """
     path = djk.pathTo(analyzer['paths'], destStation)
     return path
+
+def f_primeros_ultimos(lista, n):
+    c = 0
+    len = lt.size(lista)
+    lista_def = lt.newList(datastructure="ARRAYLIST")
+    for e in lt.iterator(lista):
+        lt.addLast(lista_def, e)
+        c += 1
+        if c == n:
+            c -= 1
+            break
+    while c >= 0:
+        e = lt.getElement(lista, len-c)
+        lt.addLast(lista_def, e)
+        c -= 1
+    return lista_def
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
 
+def compareNumRutas (aer1, aer2):
+    if aer1["num_routes"] > aer2["num_routes"]:
+        return True
+    else:
+        return False
 #Requerimientos
 
 def req_1(analyzer):
@@ -208,6 +244,7 @@ def req_1(analyzer):
         if gr.degree(rutas, a) > 1:
             num += 1
             lt.addLast(lista, mp.get(aeropuertos, a)["value"]["elements"][0])
+    lista = sa.sort(lista, compareNumRutas)
     return num, lista
 
 def req_2(analyzer, a1, a2):

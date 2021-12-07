@@ -36,9 +36,9 @@ se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
 
-airportsfile = 'Skylines/airports_full.csv'
-routesfile = 'Skylines/routes_full.csv'
-citiesfile = 'Skylines/worldcities.csv'
+airportsfile = 'Skylines/airports-utf8-small.csv'
+routesfile = 'Skylines/routes-utf8-small.csv'
+citiesfile = 'Skylines/worldcities-utf8.csv'
 
 def printMenu():
     print("Bienvenido")
@@ -64,7 +64,7 @@ def thread_cycle():
             cont = controller.init()
             #cargar datos
             print("\nCargando información ....\n")
-            controller.loadServices(cont, airportsfile, routesfile, citiesfile)
+            (cont,c) = controller.loadServices(cont, airportsfile, routesfile, citiesfile)
             print("El número total de aeropuertos es: " + str(controller.totalAirports(cont)))
             print("El número total de rutas es: " + str(controller.totalRoutes(cont)))
             print("El número total de ciudades es: " + str(controller.totalCities(cont)))
@@ -74,10 +74,13 @@ def thread_cycle():
         elif int(inputs[0]) == 2:
             print("\nCargando aeropuertos más conectados...\n")
             num, lista = controller.req_1(cont)
+            i = 0
             for a in lt.iterator(lista):
-                print("IATA : " + a["IATA"] + " - Nombre : " + a["Name"] + " - Ciudad : " + a["City"] +
-                    " - Pais : "+ a["Country"] + " - Numero Rutas : " + str(a["num_routes"]))
-            print("Estos son los eropuertos interconectados. En total son " + str(num) +"\n")
+                if i < 5:
+                    print("IATA : " + a["IATA"] + " - Nombre : " + a["Name"] + " - Ciudad : " + a["City"] +
+                        " - Pais : "+ a["Country"] + " - Numero Rutas : " + str(a["num_routes"]))
+                i += 1
+            print("\nEstos son los aeropuertos interconectados. En total son " + str(num) +"\n")
 
         elif int(inputs[0]) == 3:
             print("\nCargando aeropuertos más conectados...\n")
