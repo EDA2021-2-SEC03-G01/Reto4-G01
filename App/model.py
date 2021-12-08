@@ -343,19 +343,26 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     camino_minimo = minimumCostPath(analyzer, destino)
     return (origen, destino, camino_minimo)
 
-def req_4(analyzer, ciudad):
+def req_4(analyzer, va):
     rutas = analyzer["rutas_dobles"]
-    aeropuertos = analyzer["aeropuertos"]
-    search = prim.PrimMST(rutas)
-    arcos = prim.edgesMST(rutas, search)
-    lista_arcos = arcos["edgeTo"]["table"]
-    for d in lt.iterator(lista_arcos):
-        if d["key"] != None:
-            for va in d["value"]["vertexA"]:
-                if ciudad == mp.get(aeropuertos, va)["value"]["City"]:
-                    searcha = dfs.DepthFirstSearch(rutas, va)
-                    searcha = dfs.DepthFirstSearch(rutas, va)
-                    dfs.pathTo(search, d["key"])
-
-    return 
+    MST = prim.PrimMST(rutas)
+    x = prim.prim(rutas, MST, va)
+        
+    search = dfs.DepthFirstSearch(rutas, va)
+    lista_arcos = search["visited"]["table"]
+    sizemayor = 0
+    for d in lt.iterator(lista_arcos): 
+        vb = d["key"]
+        camino = dfs.pathTo(search, va)
+        #print(camino)
+        
+        if vb != None and d["key"] != va:
+            search = dfs.DepthFirstSearch(rutas, vb)
+            camino = dfs.pathTo(search, va)
+            if size(camino) > sizemayor:
+                sizemayor = size(camino)
+                maslargo = camino
+    
+    #print(maslargo)
+            
 

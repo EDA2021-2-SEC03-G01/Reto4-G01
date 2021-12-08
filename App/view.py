@@ -123,7 +123,7 @@ def thread_cycle():
             print("El recorrido que se hace es: " + str(camino_minimo))
 
         elif int(inputs[0]) == 5:
-            controller.req_4(cont)
+            controller.req_4(cont, "LIS")
         else:
             sys.exit(0)
 

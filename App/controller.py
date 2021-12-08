@@ -129,5 +129,5 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     (origen, destino, camino_minimo) = model.req_3(analyzer, ciudad_or, ciudad_des, a, b)
     return (origen, destino, camino_minimo)
 
-def req_4(analyzer):
-     model.req_4(analyzer)
+def req_4(analyzer, IATA):
+     model.req_4(analyzer, IATA)
