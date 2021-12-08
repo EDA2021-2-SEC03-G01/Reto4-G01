@@ -45,6 +45,8 @@ def loadServices(analyzer, airportsfile, routesfile, citiesfile):
     for airport in input_airportsfile:
         model.addAirport(analyzer, airport)
         model.addLatitud(analyzer, airport)
+        model.addVertex(analyzer, airport)
+        model.addVertexDobles(analyzer, airport)
 
     routesfile = cf.data_dir + routesfile
     input_routesfile = csv.DictReader(open(routesfile, encoding="utf-8"),
@@ -72,6 +74,12 @@ def totalAirports(analyzer):
     Retorna el total de estaciones (vertices) del grafo
     """
     return model.totalAirports(analyzer)
+
+def totalAirports2(analyzer):
+    """
+    Retorna el total de estaciones (vertices) del grafo
+    """
+    return model.totalAirports2(analyzer)
 
 def totalRoutesUnicas(analyzer):
     """

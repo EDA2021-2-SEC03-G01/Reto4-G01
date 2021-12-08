@@ -72,7 +72,7 @@ def newAnalyzer():
                                             size=9100,
                                             comparefunction=None)
     analyzer["rutas_dobles"] = gr.newGraph(datastructure="ADJ_LIST",
-                                            directed=True,
+                                            directed=False,
                                             size=9100,
                                             comparefunction=None)                                            
     return analyzer
@@ -123,53 +123,52 @@ def addidCiudad(analyzer, city):
     add(datentry, city)
     return analyzer
 
-
 def addConnections (analyzer, route):
     origen = route["Departure"]
     destino = route["Destination"]
     distancia = route["distance_km"]
-    addVertex(analyzer, origen)
-    addVertex(analyzer, destino)
     addConnection(analyzer, origen, destino, distancia)
     addRoute(analyzer, origen, destino)
 
-
 def addVertex(analyzer, aeropuerto):
-    if not gr.containsVertex(analyzer['rutas_unicas'], aeropuerto):
-            gr.insertVertex(analyzer['rutas_unicas'], aeropuerto)
+    if not gr.containsVertex(analyzer['rutas_unicas'], aeropuerto["IATA"]):
+            gr.insertVertex(analyzer['rutas_unicas'], aeropuerto["IATA"])
     return analyzer
+
+def addVertexDobles(analyzer, aeropuerto):
+    if not gr.containsVertex(analyzer['rutas_dobles'], aeropuerto["IATA"]):
+        gr.insertVertex(analyzer['rutas_dobles'], aeropuerto["IATA"])
 
 def addConnection(analyzer, origin, destination, distance):
     #edge = gr.getEdge(analyzer['rutas_unicas'], origin, destination)
     #if edge is None:
-    gr.addEdge(analyzer['rutas_unicas'], origin, destination, distance)
+    gr.addEdge(analyzer['rutas_unicas'], origin, destination, float(distance))
     return analyzer
 
 def addRoute(analyzer, origen, destino):
-
     mp.get(analyzer["aeropuertos"], origen)["value"]["elements"][0]["num_routes"] += 1
     mp.get(analyzer["aeropuertos"], destino)["value"]["elements"][0]["num_routes"] += 1
     return analyzer
 
-def addStopidayvuelta(analyzer, aeropuerto):
-
-    if not gr.containsVertex(analyzer['rutas_dobles'], aeropuerto):
-        gr.insertVertex(analyzer['rutas_dobles'], aeropuerto)
-
 def addRutasDobles(analyzer):
-
     vertices_tot = gr.vertices(analyzer['rutas_unicas'])
-    for v in lt.iterator(vertices_tot):
-        adjacentes = gr.adjacents(analyzer['rutas_unicas'], v)
-        for v2 in lt.iterator(adjacentes):
-            arcos = gr.adjacentEdges(analyzer['rutas_unicas'], v2)
-            for a in lt.iterator(arcos):
-                if a['vertexB'] == v:
-                    addStopidayvuelta(analyzer, a['vertexA'])
-                    addStopidayvuelta(analyzer, a['vertexB'])
-                    existe_arco = gr.getEdge(analyzer['rutas_dobles'], a['vertexA'], a['vertexB'])
-                    if existe_arco is None:
-                        gr.addEdge(analyzer['rutas_dobles'], a['vertexA'], a['vertexB'],float(a['weight']))
+    for va in lt.iterator(vertices_tot):
+        arcosa = gr.adjacentEdges(analyzer['rutas_unicas'], va)
+        adjacentesa = gr.adjacents(analyzer['rutas_unicas'], va)
+        for a in lt.iterator(arcosa):
+            for vb in lt.iterator(adjacentesa):
+                if a['vertexB'] == vb:
+                    arco = gr.getEdge(analyzer['rutas_dobles'], va, vb)
+                    if arco is None:
+                        gr.addEdge(analyzer['rutas_dobles'], va, vb, float(a['weight']))
+                arcosb = gr.adjacentEdges(analyzer['rutas_unicas'], vb)
+                adjacentesb = gr.adjacents(analyzer['rutas_unicas'], vb)
+                for a in lt.iterator(arcosb):
+                    for va in lt.iterator(adjacentesb):
+                        if a['vertexB'] == va:
+                            arco = gr.getEdge(analyzer['rutas_dobles'], vb, va)
+                            if arco is None:
+                                gr.addEdge(analyzer['rutas_dobles'], vb, va, float(a['weight']))       
 
 def add(datentry, entry):
     lt.addLast(datentry, entry)
@@ -187,11 +186,18 @@ def newDataEntry(entry):
 
 # Funciones de consulta
 
+
 def totalAirports(analyzer):
     """
     Retorna el total de aeropuertos
     """
-    return mp.size(analyzer["aeropuertos"])
+    return gr.numVertices(analyzer["rutas_unicas"])
+
+def totalAirports2(analyzer):
+    """
+    Retorna el total de aeropuertos
+    """
+    return gr.numVertices(analyzer["rutas_dobles"])
 
 def totalRoutesUnicas(analyzer):
     """
@@ -280,10 +286,11 @@ def req_1(analyzer):
     rutas = analyzer["rutas_unicas"]
     aeropuertos = analyzer["aeropuertos"]
     lista = lt.newList(datastructure="ARRAY_LIST")
-    for a in lt.iterator(gr.vertices(rutas)):
-        lt.addLast(lista, mp.get(aeropuertos, a)["value"]["elements"][0])
+    for v in lt.iterator(gr.vertices(rutas)):
+        if gr.degree(rutas, v) >= 1 or gr.indegree(rutas, v) >= 1:
+            lt.addLast(lista, mp.get(aeropuertos, v)["value"]["elements"][0])
     lista = sa.sort(lista, compareNumRutas)
-    return size(gr.vertices(rutas)), lista
+    return lt.size(lista), lista
 
 def req_2(analyzer, a1, a2):
     rutas = analyzer["rutas_unicas"]
