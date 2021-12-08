@@ -140,9 +140,9 @@ def addVertexDobles(analyzer, aeropuerto):
         gr.insertVertex(analyzer['rutas_dobles'], aeropuerto["IATA"])
 
 def addConnection(analyzer, origin, destination, distance):
-    #edge = gr.getEdge(analyzer['rutas_unicas'], origin, destination)
-    #if edge is None:
-    gr.addEdge(analyzer['rutas_unicas'], origin, destination, float(distance))
+    edge = gr.getEdge(analyzer['rutas_unicas'], origin, destination)
+    if edge is None:
+        gr.addEdge(analyzer['rutas_unicas'], origin, destination, float(distance))
     return analyzer
 
 def addRoute(analyzer, origen, destino):
@@ -153,23 +153,15 @@ def addRoute(analyzer, origen, destino):
 def addRutasDobles(analyzer):
     vertices_tot = gr.vertices(analyzer['rutas_unicas'])
     for va in lt.iterator(vertices_tot):
-        arcosa = gr.adjacentEdges(analyzer['rutas_unicas'], va)
-        adjacentesa = gr.adjacents(analyzer['rutas_unicas'], va)
-        for a in lt.iterator(arcosa):
-            for vb in lt.iterator(adjacentesa):
-                if a['vertexB'] == vb:
+        adjacentes = gr.adjacents(analyzer['rutas_unicas'], va)
+        for vb in lt.iterator(adjacentes):
+            arcos = gr.adjacentEdges(analyzer['rutas_unicas'], vb)
+            for a in lt.iterator(arcos):
+                if a['vertexB'] == va:
                     arco = gr.getEdge(analyzer['rutas_dobles'], va, vb)
                     if arco is None:
                         gr.addEdge(analyzer['rutas_dobles'], va, vb, float(a['weight']))
-                arcosb = gr.adjacentEdges(analyzer['rutas_unicas'], vb)
-                adjacentesb = gr.adjacents(analyzer['rutas_unicas'], vb)
-                for a in lt.iterator(arcosb):
-                    for va in lt.iterator(adjacentesb):
-                        if a['vertexB'] == va:
-                            arco = gr.getEdge(analyzer['rutas_dobles'], vb, va)
-                            if arco is None:
-                                gr.addEdge(analyzer['rutas_dobles'], vb, va, float(a['weight']))       
-
+            
 def add(datentry, entry):
     lt.addLast(datentry, entry)
     return datentry
@@ -351,9 +343,19 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     camino_minimo = minimumCostPath(analyzer, destino)
     return (origen, destino, camino_minimo)
 
-def req_4(analyzer):
-    rutas = analyzer["rutas_unicas"]
+def req_4(analyzer, ciudad):
+    rutas = analyzer["rutas_dobles"]
+    aeropuertos = analyzer["aeropuertos"]
     search = prim.PrimMST(rutas)
-    arcos = prim.weightMST(rutas, search)
-    return
+    arcos = prim.edgesMST(rutas, search)
+    lista_arcos = arcos["edgeTo"]["table"]
+    for d in lt.iterator(lista_arcos):
+        if d["key"] != None:
+            for va in d["value"]["vertexA"]:
+                if ciudad == mp.get(aeropuertos, va)["value"]["City"]:
+                    searcha = dfs.DepthFirstSearch(rutas, va)
+                    searcha = dfs.DepthFirstSearch(rutas, va)
+                    dfs.pathTo(search, d["key"])
+
+    return 
 
