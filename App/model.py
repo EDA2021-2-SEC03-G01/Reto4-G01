@@ -32,7 +32,10 @@ from DISClib.ADT.graph import getEdge, gr
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 from DISClib.Algorithms.Graphs import scc
+from DISClib.Algorithms.Graphs import prim
+from DISClib.Algorithms.Graphs import dfs
 from DISClib.Algorithms.Graphs import dijsktra as djk
+
 from DISClib.Utils import error as error
 assert config
 from DISClib.DataStructures import mapentry as me
@@ -68,6 +71,10 @@ def newAnalyzer():
                                             directed=True,
                                             size=9100,
                                             comparefunction=None)
+    analyzer["rutas_dobles"] = gr.newGraph(datastructure="ADJ_LIST",
+                                            directed=True,
+                                            size=9100,
+                                            comparefunction=None)                                            
     return analyzer
 
 # Funciones para agregar informacion al catalogo
@@ -144,6 +151,26 @@ def addRoute(analyzer, origen, destino):
     mp.get(analyzer["aeropuertos"], destino)["value"]["elements"][0]["num_routes"] += 1
     return analyzer
 
+def addStopidayvuelta(analyzer, aeropuerto):
+
+    if not gr.containsVertex(analyzer['rutas_dobles'], aeropuerto):
+        gr.insertVertex(analyzer['rutas_dobles'], aeropuerto)
+
+def addRutasDobles(analyzer):
+
+    vertices_tot = gr.vertices(analyzer['rutas_unicas'])
+    for v in lt.iterator(vertices_tot):
+        adjacentes = gr.adjacents(analyzer['rutas_unicas'], v)
+        for v2 in lt.iterator(adjacentes):
+            arcos = gr.adjacentEdges(analyzer['rutas_unicas'], v2)
+            for a in lt.iterator(arcos):
+                if a['vertexB'] == v:
+                    addStopidayvuelta(analyzer, a['vertexA'])
+                    addStopidayvuelta(analyzer, a['vertexB'])
+                    existe_arco = gr.getEdge(analyzer['rutas_dobles'], a['vertexA'], a['vertexB'])
+                    if existe_arco is None:
+                        gr.addEdge(analyzer['rutas_dobles'], a['vertexA'], a['vertexB'],float(a['weight']))
+
 def add(datentry, entry):
     lt.addLast(datentry, entry)
     return datentry
@@ -166,11 +193,17 @@ def totalAirports(analyzer):
     """
     return mp.size(analyzer["aeropuertos"])
 
-def totalRoutes(analyzer):
+def totalRoutesUnicas(analyzer):
     """
     Retorna el total arcos del grafo
     """
     return gr.numEdges(analyzer['rutas_unicas'])
+    
+def totalRoutesDobles(analyzer):
+    """
+    Retorna el total arcos del grafo
+    """
+    return gr.numEdges(analyzer['rutas_dobles'])
 
 def totalCities(analyzer):
     """
@@ -181,6 +214,14 @@ def totalCities(analyzer):
 def infoPrimerAeropuerto(analyzer):
     aeropuerto = lt.getElement(mp.keySet(analyzer["aeropuertos"]), 1)
     return mp.get(analyzer["aeropuertos"], aeropuerto)["value"]["elements"][0]
+
+def infoUltimoAeropuerto(analyzer):
+    aeropuerto = lt.getElement(mp.keySet(analyzer["aeropuertos"]), lt.size(mp.keySet(analyzer["aeropuertos"])))
+    return mp.get(analyzer["aeropuertos"], aeropuerto)["value"]["elements"][0]
+
+def infoPrimeraCiudad(analyzer):
+    ciudad = lt.getElement(mp.keySet(analyzer["ciudades"]), 1)
+    return mp.get(analyzer["ciudades"], ciudad)["value"]["elements"][0]
 
 def infoUltimaCiudad(analyzer):
     ciudad = lt.getElement(mp.keySet(analyzer["ciudades"]), lt.size(mp.keySet(analyzer["ciudades"])))
@@ -239,13 +280,10 @@ def req_1(analyzer):
     rutas = analyzer["rutas_unicas"]
     aeropuertos = analyzer["aeropuertos"]
     lista = lt.newList(datastructure="ARRAY_LIST")
-    num = 0
     for a in lt.iterator(gr.vertices(rutas)):
-        if gr.degree(rutas, a) > 1:
-            num += 1
-            lt.addLast(lista, mp.get(aeropuertos, a)["value"]["elements"][0])
+        lt.addLast(lista, mp.get(aeropuertos, a)["value"]["elements"][0])
     lista = sa.sort(lista, compareNumRutas)
-    return num, lista
+    return size(gr.vertices(rutas)), lista
 
 def req_2(analyzer, a1, a2):
     rutas = analyzer["rutas_unicas"]
@@ -306,5 +344,9 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     camino_minimo = minimumCostPath(analyzer, destino)
     return (origen, destino, camino_minimo)
 
-
+def req_4(analyzer):
+    rutas = analyzer["rutas_unicas"]
+    search = prim.PrimMST(rutas)
+    arcos = prim.weightMST(rutas, search)
+    return
 

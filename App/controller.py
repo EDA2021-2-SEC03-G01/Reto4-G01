@@ -59,6 +59,9 @@ def loadServices(analyzer, airportsfile, routesfile, citiesfile):
     for city in input_citiesfile:
         model.addCiudad(analyzer, city)
         model.addidCiudad(analyzer, city)
+
+    model.addRutasDobles(analyzer)
+
     return analyzer,c
 
 # Funciones de ordenamiento
@@ -70,11 +73,17 @@ def totalAirports(analyzer):
     """
     return model.totalAirports(analyzer)
 
-def totalRoutes(analyzer):
+def totalRoutesUnicas(analyzer):
     """
     Retorna el total arcos del grafo
     """
-    return model.totalRoutes(analyzer)
+    return model.totalRoutesUnicas(analyzer)
+
+def totalRoutesDobles(analyzer):
+    """
+    Retorna el total arcos del grafo
+    """
+    return model.totalRoutesDobles(analyzer)
 
 def totalCities(analyzer):
     """
@@ -84,6 +93,12 @@ def totalCities(analyzer):
 
 def infoPrimerAeropuerto(analyzer):
     return model.infoPrimerAeropuerto(analyzer)
+
+def infoUltimoAeropuerto(analyzer):
+    return model.infoUltimoAeropuerto(analyzer)
+
+def infoPrimeraCiudad(analyzer):
+    return model.infoPrimeraCiudad(analyzer)
 
 def infoUltimaCiudad(analyzer):
     return model.infoUltimaCiudad(analyzer)
@@ -105,3 +120,6 @@ def ciudades_homonimas(analyzer, ciudad):
 def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     (origen, destino, camino_minimo) = model.req_3(analyzer, ciudad_or, ciudad_des, a, b)
     return (origen, destino, camino_minimo)
+
+def req_4(analyzer):
+     model.req_4(analyzer)

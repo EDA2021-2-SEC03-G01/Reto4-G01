@@ -65,11 +65,20 @@ def thread_cycle():
             #cargar datos
             print("\nCargando información ....\n")
             (cont,c) = controller.loadServices(cont, airportsfile, routesfile, citiesfile)
+            print("\n---GRAFO DIRIGIDO---\n")
             print("El número total de aeropuertos es: " + str(controller.totalAirports(cont)))
-            print("El número total de rutas es: " + str(controller.totalRoutes(cont)))
-            print("El número total de ciudades es: " + str(controller.totalCities(cont)))
+            print("El número total de rutas es: " + str(controller.totalRoutesUnicas(cont)))
             print("La información del primer aeropuerto cargado es: " + str(controller.infoPrimerAeropuerto(cont)))
             print("La información de la última ciudad cargada es: " + str(controller.infoUltimaCiudad(cont))+"\n")
+            print("\n---GRAFO NO DIRIGIDO---\n")
+            print("El número total de aeropuertos es: " + str(controller.totalAirports(cont)))
+            print("El número total de rutas es: " + str(controller.totalRoutesDobles(cont)))
+            print("La información del primer aeropuerto cargado es: " + str(controller.infoPrimerAeropuerto(cont)))
+            print("La información del ultimo aeropuerto cargado es: " + str(controller.infoUltimoAeropuerto(cont)))
+            print("\n---CIUDADES---\n")
+            print("El número total de ciudades es: " + str(controller.totalCities(cont)))
+            print("La información de la primera ciudad cargada es: " + str(controller.infoPrimeraCiudad(cont)))
+            print("La información de la última ciudad cargada es: " + str(controller.infoUltimaCiudad(cont)))
 
         elif int(inputs[0]) == 2:
             print("\nCargando aeropuertos más conectados...\n")
@@ -84,14 +93,14 @@ def thread_cycle():
 
         elif int(inputs[0]) == 3:
             print("\nCargando aeropuertos más conectados...\n")
-            a1 = input("Ingrese el primer aeropuerto de interés:")
-            a2 = input("Ingrese el segundo aeropuerto de interés:")
+            a1 = input("Ingrese el primer aeropuerto de interés: ")
+            a2 = input("Ingrese el segundo aeropuerto de interés: ")
             num, mismo = controller.req_2(cont, a1, a2)
-            print("\nEn total hay " + str(num) + "clústeres.")
+            print("\nEn total hay " + str(num) + " clústeres.")
             if mismo == True:
-                print(a1 + " y " + a2 + " sí están en el mismo clúster")
+                print(a1 + " y " + a2 + " sí están en el mismo clúster\n")
             else:
-                print(a1 + " y " + a2 + " no están en el mismo clúster")
+                print(a1 + " y " + a2 + " no están en el mismo clúster\n")
 
         elif int(inputs[0]) == 4:
             ciudad_or = input("Introduzca la ciudad de origen: ")
@@ -102,7 +111,7 @@ def thread_cycle():
                 i +=1
             a = input("Seleccione ciudad de origen: ")
             ciudad_des = input("Introduzca la ciudad de destino: ")
-            lista_ciudades = controller.ciudades_homonimas(cont, ciudad_or)
+            lista_ciudades = controller.ciudades_homonimas(cont, ciudad_des)
             i=1
             for ciudad in lt.iterator(lista_ciudades):
                 print(str(i) + ". " + str(ciudad))
@@ -112,6 +121,9 @@ def thread_cycle():
             print("El aeropuerto de origen es: " + origen["Name"])
             print("El aeropuerto de destino es: " + destino["Name"])
             print("El recorrido que se hace es: " + str(camino_minimo))
+
+        elif int(inputs[0]) == 5:
+            controller.req_4(cont)
         else:
             sys.exit(0)
 
