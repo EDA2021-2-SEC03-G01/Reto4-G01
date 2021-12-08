@@ -124,6 +124,27 @@ def thread_cycle():
 
         elif int(inputs[0]) == 5:
             controller.req_4(cont, "LIS")
+
+        elif int(inputs[0]) == 6:
+            aer = input("Digite el IATA del aeropuerto cerrado: ")
+            print("\n---GRAFO DIRIGIDO---\n")
+            print("El número original de aeropuertos es: " + str(controller.totalAirports(cont)))
+            print("El número original de rutas es: " + str(controller.totalRoutesUnicas(cont)))
+            print("\n---GRAFO NO DIRIGIDO---\n")
+            print("El número original de aeropuertos es: " + str(controller.totalAirports2(cont)))
+            print("El número original de rutas es: " + str(controller.totalRoutesDobles(cont)))
+            print("\n\nEliminando el aeropuerto con IATA " + aer + "...\n\n")
+            (cont, num_afectados, lista) = controller.req_5(cont, aer)
+            print("\n---GRAFO DIRIGIDO---\n")
+            print("El número resultante de aeropuertos es: " + str(controller.totalAirports(cont)))
+            print("El número resultante de rutas es: " + str(controller.totalRoutesUnicas(cont)))
+            print("\n---GRAFO NO DIRIGIDO---\n")
+            print("El número resultante de aeropuertos es: " + str(controller.totalAirports2(cont)))
+            print("El número resultante de rutas es: " + str(controller.totalRoutesDobles(cont)))
+            print("\n" + str(num_afectados) + " aeropuertos fueron afectados.\n")
+            print("A continuacion los primeros y ultimos 3 aeropuertos afectados: \n")
+            for a in lt.iterator(lista):
+                print(a)
         else:
             sys.exit(0)
 

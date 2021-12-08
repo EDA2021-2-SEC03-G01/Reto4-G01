@@ -131,3 +131,7 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
 
 def req_4(analyzer, IATA):
      model.req_4(analyzer, IATA)
+
+def req_5(analyzer, aer):
+    (analyzer, num_afectados, lista) = model.req_5(analyzer, aer)
+    return (analyzer, num_afectados, lista)

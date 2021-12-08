@@ -363,6 +363,23 @@ def req_4(analyzer, va):
                 sizemayor = size(camino)
                 maslargo = camino
     
-    #print(maslargo)
+def req_5 (analyzer, aer):
+    aeropuertos = analyzer["aeropuertos"]
+    gr.removeVertex(analyzer["rutas_unicas"], aer)
+    gr.removeVertex(analyzer["rutas_dobles"], aer)
+    aer_afectados = gr.adjacents(analyzer["rutas_unicas"], aer)
+    afectados = lt.newList(datastructure="ARRAY_LIST")
+    for aer in lt.iterator(aer_afectados):
+        if aer not in afectados:
+            lt.addLast(afectados, aer)
+    lista = lt.newList(datastructure="ARRAY_LIST")
+    for af in lt.iterator(afectados):
+        aer = mp.get(aeropuertos, af)["value"]["elements"][0]
+        dic_aer = {"Nombre":aer["Name"], "Ciudad":aer["City"], "Pais":aer["Country"]}
+        lt.addLast(lista, dic_aer)
+    num_afectados = lt.size(lista)
+    if lt.size(lista) >= 6:
+        lista = f_primeros_ultimos(lista, 3)
+    return analyzer, num_afectados, lista
             
 
