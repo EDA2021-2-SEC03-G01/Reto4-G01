@@ -344,26 +344,41 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
         distancia_tot += float(t["weight"])
     return (origen, destino, camino_minimo, distancia_tot)
 
-def req_4(analyzer, va):
+def req_4(analyzer, iata, millas):
+    distancia_km = millas * 1.6
     rutas = analyzer["rutas_dobles"]
-    MST = prim.PrimMST(rutas)
-    x = prim.prim(rutas, MST, va)
-        
-    search = dfs.DepthFirstSearch(rutas, va)
-    lista_arcos = search["visited"]["table"]
-    sizemayor = 0
-    for d in lt.iterator(lista_arcos): 
-        vb = d["key"]
-        camino = dfs.pathTo(search, va)
-        #print(camino)
-        
-        if vb != None and d["key"] != va:
-            search = dfs.DepthFirstSearch(rutas, vb)
-            camino = dfs.pathTo(search, va)
-            if size(camino) > sizemayor:
-                sizemayor = size(camino)
-                maslargo = camino
+    resultado = prim.PrimMST(rutas)
+    distancia_max = round(prim.weightMST(rutas, resultado), 2)
+    lista = resultado["mst"]
+    auxiliar = []
+    recorrido_dfs = dfs.DepthFirstSearch(rutas, iata)
+    distancia = 0
+    lista_ruta = lt.newList(datastructure="ARRAY_LIST")
+    for viaje in lt.iterator(lista):
+        va = viaje["vertexA"]
+        vb = viaje["vertexB"]
+        weight = viaje["weight"]
+        if va not in auxiliar:
+            list.append(auxiliar, va)
+        if vb not in auxiliar:
+            list.append(auxiliar, vb)
+        if dfs.hasPathTo(recorrido_dfs, va) and dfs.hasPathTo(recorrido_dfs, vb):
+            r = {"Deperture":va, "Destination":vb, "Distance (km)":weight}
+            lt.addLast(lista_ruta, r)
+            distancia += weight
+    distancia_tot = distancia*2
+    alcanza = False
+    if distancia_tot > distancia_km:
+        dif_millas = round(((distancia_tot-distancia_km)/1.6),2)
+    else:
+        dif_millas = round(((distancia_km-distancia_tot)/1.6),2)
+        alcanza = True
+       
+    distancia_tot = round(distancia_tot/2, 2)
+    tamaño = len(auxiliar)
     
+    return (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, tamaño)
+
 def req_5 (analyzer, aer):
     aeropuertos = analyzer["aeropuertos"]
     gr.removeVertex(analyzer["rutas_unicas"], aer)
