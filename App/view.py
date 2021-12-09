@@ -128,18 +128,18 @@ def thread_cycle():
         elif int(inputs[0]) == 5:
             iata = input("Ingrese el IATA del aeropuerto de salida: ")
             millas = float(input("Ingrese el numero de millas disponibles: "))
-            (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, tamaño) = controller.req_4(cont, iata, millas)
-            print("\nNumero de aeropuertos en la ruta: " + str(tamaño))
+            (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, num_aeropuertos) = controller.req_4(cont, iata, millas)
+            print("\nNumero de aeropuertos en la ruta: " + str(num_aeropuertos))
             print("Distancia total de todas las rutas (km): " + str(distancia_max))
             print("Distancia en km equivalente a las millas: " + str(distancia_km))
-            print("Distancia máxima: " + str(distancia_tot))
-            print("\nDetalles del camino mas largo: ")
+            print("Distancia de la ruta más larga: " + str(distancia_tot))
+            print("\nDetalles de la ruta más larga: ")
             for d in lt.iterator(lista_ruta):
                 print(d)
             if alcanza:
                 print("\nEl pasajero puede completar el viaje y le sobran " + str(dif_millas) + " millas.")
             else:
-                print("\nEl pasajero necesita " + str(dif_millas) + " millas para completar el viaje.")
+                print("\nEl pasajero necesita " + str(dif_millas) + " millas para completar el viaje.\n")
 
         elif int(inputs[0]) == 6:
             aer = input("Digite el IATA del aeropuerto cerrado: ")

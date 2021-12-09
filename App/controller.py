@@ -130,8 +130,8 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     return (origen, destino, camino_minimo, distancia_tot)
 
 def req_4(analyzer, iata, millas):
-    (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, tamaño) = model.req_4(analyzer, iata, millas)
-    return (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, tamaño)
+    (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, num_aeropuertos) = model.req_4(analyzer, iata, millas)
+    return (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, num_aeropuertos)
 
 def req_5(analyzer, aer):
     (analyzer, num_afectados, lista) = model.req_5(analyzer, aer)

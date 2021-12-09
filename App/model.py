@@ -347,37 +347,35 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
 def req_4(analyzer, iata, millas):
     distancia_km = millas * 1.6
     rutas = analyzer["rutas_dobles"]
-    resultado = prim.PrimMST(rutas)
-    distancia_max = round(prim.weightMST(rutas, resultado), 2)
-    lista = resultado["mst"]
-    auxiliar = []
-    recorrido_dfs = dfs.DepthFirstSearch(rutas, iata)
-    distancia = 0
+    search_prim = prim.PrimMST(rutas)
+    distancia_max = round(prim.weightMST(rutas, search_prim), 2)
+    lista = search_prim["mst"]
+    search_dfs = dfs.DepthFirstSearch(rutas, iata)
     lista_ruta = lt.newList(datastructure="ARRAY_LIST")
+    aeropuertos = []
+    distancia = 0
     for viaje in lt.iterator(lista):
         va = viaje["vertexA"]
         vb = viaje["vertexB"]
         weight = viaje["weight"]
-        if va not in auxiliar:
-            list.append(auxiliar, va)
-        if vb not in auxiliar:
-            list.append(auxiliar, vb)
-        if dfs.hasPathTo(recorrido_dfs, va) and dfs.hasPathTo(recorrido_dfs, vb):
+        if va not in aeropuertos:
+            list.append(aeropuertos, va)
+        if vb not in aeropuertos:
+            list.append(aeropuertos, vb)
+        if dfs.hasPathTo(search_dfs, va) and dfs.hasPathTo(search_dfs, vb):
             r = {"Deperture":va, "Destination":vb, "Distance (km)":weight}
             lt.addLast(lista_ruta, r)
             distancia += weight
     distancia_tot = distancia*2
     alcanza = False
     if distancia_tot > distancia_km:
-        dif_millas = round(((distancia_tot-distancia_km)/1.6),2)
+        dif_millas = round(((distancia_tot-distancia_km)/1.6), 2)
     else:
-        dif_millas = round(((distancia_km-distancia_tot)/1.6),2)
+        dif_millas = round(((distancia_km-distancia_tot)/1.6), 2)
         alcanza = True
-       
     distancia_tot = round(distancia_tot/2, 2)
-    tamaño = len(auxiliar)
-    
-    return (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, tamaño)
+    num_aeropuertos = len(aeropuertos)
+    return (distancia_max, lista_ruta, distancia_tot, alcanza, dif_millas, distancia_km, num_aeropuertos)
 
 def req_5 (analyzer, aer):
     aeropuertos = analyzer["aeropuertos"]
