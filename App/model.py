@@ -395,5 +395,3 @@ def req_5 (analyzer, aer):
     if lt.size(lista) >= 6:
         lista = f_primeros_ultimos(lista, 3)
     return analyzer, num_afectados, lista
-            
-
