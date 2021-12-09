@@ -53,7 +53,8 @@ def newAnalyzer():
     analyzer = {"ciudades":None,
                 "aeropuertos":None,
                 "rutas_dobles":None,
-                "rutas_unicas":None
+                "rutas_unicas":None,
+                "paths":None
                 }
     analyzer["ciudades"] = mp.newMap(numelements=41001,
                                     maptype='PROBING',
@@ -308,40 +309,40 @@ def req_3(analyzer, ciudad_or, ciudad_des, a, b):
     latitudes = mp.keySet(analyzer["latitudes"])
     while centinela or centinela1:
         for lat in lt.iterator(latitudes):
-            aer_lat = mp.get(analyzer["latitudes"], lat)["value"]
-            for aer in lt.iterator(aer_lat):
-                if (float(lat_ciu_or)-(0.1*i)) <= float(lat) <= (float(lat_ciu_or)+(0.1*i)) and (float(lng_ciu_or)-(0.1*i)) <= float(aer["Longitude"]) <= (float(lng_ciu_or)+(0.1*i)):
-                    lt.addLast(lista_aeropuertos_or, aer)
-                    centinela = False
-                if (float(lat_ciu_des)-(0.1*i)) <= float(lat) <= (float(lat_ciu_des)+(0.1*i)) and (float(lng_ciu_des)-(0.1*i)) <= float(aer["Longitude"]) <= (float(lng_ciu_des)+(0.1*i)):
-                    lt.addLast(lista_aeropuertos_des, aer) 
-                    centinela1 = False
+            if (float(lat_ciu_or)-(0.1*i)) <= float(lat) <= (float(lat_ciu_or)+(0.1*i)) or (float(lat_ciu_des)-(0.1*i)) <= float(lat) <= (float(lat_ciu_des)+(0.1*i)):
+                aer_lat = mp.get(analyzer["latitudes"], lat)["value"]
+                for aer in lt.iterator(aer_lat):
+                    if (float(lng_ciu_or)-(0.1*i)) <= float(aer["Longitude"]) <= (float(lng_ciu_or)+(0.1*i)) and centinela:
+                        lt.addLast(lista_aeropuertos_or, aer)
+                        centinela = False
+                    if (float(lng_ciu_des)-(0.1*i)) <= float(aer["Longitude"]) <= (float(lng_ciu_des)+(0.1*i)) and centinela1:
+                        lt.addLast(lista_aeropuertos_des, aer) 
+                        centinela1 = False
         i += 1
     menor=9999999
     for aer in lt.iterator(lista_aeropuertos_or):
-        print(aer)
         lat = aer["Latitude"]
         lng = aer["Longitude"]
         distancia = semiverseno(lat_ciu_or, lat, lng_ciu_or, lng)
         if distancia <= menor:
-            distancia = menor
+            menor = distancia
             origen = aer
     dist_origen = menor
-    print(origen)
     menor = 999999
     for aer in lt.iterator(lista_aeropuertos_des):
-        print(aer)
         lat = aer["Latitude"]
         lng = aer["Longitude"]
-        distancia = semiverseno(lat_ciu_or, lat, lng_ciu_or, lng)
+        distancia = semiverseno(lat_ciu_des, lat, lng_ciu_des, lng)
         if distancia <= menor:
-            distancia = menor
+            menor = distancia
             destino = aer
-    print(destino)
     dist_destino = menor
-    caminos_minimos = minimumCostPaths(analyzer, origen)
-    camino_minimo = minimumCostPath(analyzer, destino)
-    return (origen, destino, camino_minimo)
+    minimumCostPaths(analyzer, origen["IATA"])
+    camino_minimo = minimumCostPath(analyzer, destino["IATA"])
+    distancia_tot = dist_origen + dist_destino
+    for t in lt.iterator(camino_minimo):
+        distancia_tot += float(t["weight"])
+    return (origen, destino, camino_minimo, distancia_tot)
 
 def req_4(analyzer, va):
     rutas = analyzer["rutas_dobles"]

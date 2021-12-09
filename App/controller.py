@@ -126,8 +126,8 @@ def ciudades_homonimas(analyzer, ciudad):
     return lista_ciudades
 
 def req_3(analyzer, ciudad_or, ciudad_des, a, b):
-    (origen, destino, camino_minimo) = model.req_3(analyzer, ciudad_or, ciudad_des, a, b)
-    return (origen, destino, camino_minimo)
+    (origen, destino, camino_minimo, distancia_tot) = model.req_3(analyzer, ciudad_or, ciudad_des, a, b)
+    return (origen, destino, camino_minimo, distancia_tot)
 
 def req_4(analyzer, IATA):
      model.req_4(analyzer, IATA)

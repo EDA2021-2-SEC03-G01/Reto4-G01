@@ -117,10 +117,13 @@ def thread_cycle():
                 print(str(i) + ". " + str(ciudad))
                 i +=1
             b = input("Seleccione ciudad de destino: ")
-            (origen, destino, camino_minimo) = controller.req_3(cont, ciudad_or, ciudad_des, a, b)
-            print("El aeropuerto de origen es: " + origen["Name"])
-            print("El aeropuerto de destino es: " + destino["Name"])
-            print("El recorrido que se hace es: " + str(camino_minimo))
+            (origen, destino, camino_minimo, distancia_tot) = controller.req_3(cont, ciudad_or, ciudad_des, a, b)
+            print("El aeropuerto de origen es: " + origen["IATA"] + " - " + origen["Name"] + " en " + origen["City"] + "(" + origen["Country"] + ")")
+            print("El aeropuerto de destino es: " + destino["IATA"] + " - " + origen["Name"] + " en " + destino["City"] + "(" + destino["Country"] + ")")
+            print("El recorrido que se hace es: \n")
+            for t in lt.iterator(camino_minimo):
+                print(t["vertexA"] + " - " + t["vertexB"] + " - " + str(t["weight"]) + "\n")
+            print("La distancia total recorrida fue: " + str(distancia_tot))
 
         elif int(inputs[0]) == 5:
             controller.req_4(cont, "LIS")
